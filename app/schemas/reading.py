@@ -3,7 +3,7 @@ from enum import StrEnum
 from typing import Annotated, Self
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-
+from pydantic import ConfigDict
 
 class MetricType(StrEnum):
     TEMPERATURE = "temperature"
@@ -51,3 +51,13 @@ class ReadingCreate(BaseModel):
             )
             raise ValueError(msg)
         return self
+
+
+class ReadingOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    device_id: str
+    metric: MetricType
+    value: float
+    timestamp: datetime
