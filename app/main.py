@@ -1,12 +1,25 @@
+import structlog
 from fastapi import FastAPI
+
+from app.core.config import get_settings
+from app.core.logging import configure_logging
+
+logger = structlog.get_logger()
 
 
 def create_app() -> FastAPI:
     """Application factory: builds and configures the FastAPI instance."""
-    app = FastAPI(title="Sensor Analytics API", version="0.1.0")
+    settings = get_settings()
+    configure_logging(
+        settings.log_level,
+        json_logs=settings.environment != "local",
+    )
+
+    app = FastAPI(title=settings.app_name, version="0.1.0")
 
     @app.get("/health")
     def health() -> dict[str, str]:
+        logger.info("health_check", status="ok")
         return {"status": "ok"}
 
     return app
